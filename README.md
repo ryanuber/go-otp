@@ -22,6 +22,11 @@ passed in during creation of an `otp.Pad`, allowing the same pad data to be used
 until it has been exhausted. This makes it easy to pre-share many pages of OTP
 material in advance, and utilize the pages over time.
 
+`go-otp` also provides `Encrypt` and `Decrypt` methods to allow seamless use of
+OTP pads. These methods implement combining the plaintext and crypto page using
+[modular addition](http://en.wikipedia.org/wiki/Modular_addition). The resulting
+ciphertext is [information theoretically secure](http://en.wikipedia.org/wiki/Information_theoretic_security).
+
 Usage
 =====
 
