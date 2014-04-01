@@ -85,7 +85,7 @@ func (p *Pad) Encode(payload []byte) ([]byte, error) {
 	for i := 0; i < len(payload); i++ {
 		bdec := int64(payload[i])
 		kdec := int64(page[i])
-		encoded := uint64(bdec+kdec) % (1 << 63)
+		encoded := uint64(bdec+kdec) % ((1 << 64) - 1)
 		result = append(result, byte(encoded))
 	}
 	return result, nil
@@ -106,7 +106,7 @@ func (p *Pad) Decode(payload []byte) ([]byte, error) {
 	for i := 0; i < len(payload); i++ {
 		bdec := int64(payload[i])
 		kdec := int64(page[i])
-		decoded := uint64(bdec-kdec) % (1 << 63)
+		decoded := uint64(bdec-kdec) % ((1 << 64) - 1)
 		if decoded < 0 {
 			decoded += 26
 		}
