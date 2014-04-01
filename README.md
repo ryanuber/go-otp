@@ -5,7 +5,7 @@ OTP ("One-Time Pad") Utility for Go
 
 This simple Go package implements an [OTP](http://en.wikipedia.org/wiki/One-time_pad)
 container to ease the process of creating and utilizing single-use tokens.
-One-time pads are useful in crytology to create
+One-time pads are useful in cryptology to create
 [perfect forward secrecy](http://en.wikipedia.org/wiki/Forward_secrecy#Perfect_Forward_Secrecy)
 systems. While this implementation does not deter you from re-using keys, it
 makes switching keys or "pages" out simple and easy, and lends itself well to
