@@ -25,6 +25,21 @@ material in advance, and utilize the pages over time.
 Usage
 =====
 
+```go
+func NewPad(material []byte, pageSize int, startPage int) (*Pad, error)
+type Pad
+    func (p *Pad) TotalPages() int
+    func (p *Pad) RemainingPages() int
+    func (p *Pad) UsedPages() int
+    func (p *Pad) PreviousPage() ([]byte, error)
+    func (p *Pad) CurrentPage() []byte
+    func (p *Pad) NextPage() ([]byte, error)
+    func (p *Pad) PeekNextPage() ([]byte, error)
+```
+
+Example
+=======
+
 Following is a basic usage example which creates enough page material to
 facilitate 2048 unique one-time use byte slices, each 16 bytes in size:
 
