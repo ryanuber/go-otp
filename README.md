@@ -31,9 +31,9 @@ type Pad
     func (p *Pad) TotalPages() int
     func (p *Pad) RemainingPages() int
     func (p *Pad) UsedPages() int
-    func (p *Pad) PreviousPage() ([]byte, error)
-    func (p *Pad) CurrentPage() []byte
-    func (p *Pad) NextPage() ([]byte, error)
+    func (p *Pad) NextPage() error
+    func (p *Pad) Encrypt(payload []byte) ([]byte, error)
+    func (p *Pad) Decrypt(payload []byte) ([]byte, error)
 ```
 
 Example
@@ -63,13 +63,16 @@ func main() {
 		return
 	}
 
-	page := pad.CurrentPage()
-	fmt.Println(base64.StdEncoding.EncodeToString(page))
+	encrypted, _ := pad.Encrypt([]byte("this is a test"))
+	fmt.Println(base64.StdEncoding.EncodeToString(encrypted))
+	decrypted, _ := pad.Decrypt(encrypted)
+	fmt.Printf("%s\n\n", decrypted)
 
-	page, err = pad.NextPage()
-	if err != nil {
-		fmt.Printf("%s", err)
-	}
-	fmt.Println(base64.StdEncoding.EncodeToString(page))
+	pad.NextPage()
+
+	encrypted, _ = pad.Encrypt([]byte("this is a test"))
+	fmt.Println(base64.StdEncoding.EncodeToString(encrypted))
+	decrypted, _ = pad.Decrypt(encrypted)
+	fmt.Printf("%s\n\n", decrypted)
 }
 ```

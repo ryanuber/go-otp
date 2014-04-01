@@ -48,34 +48,25 @@ func (p *Pad) UsedPages() int {
 	return p.currentPage + 1
 }
 
-// PreviousPage returns the payload of the last used page
-func (p *Pad) PreviousPage() ([]byte, error) {
-	if p.currentPage == 0 {
-		return nil, fmt.Errorf("no previous pages")
-	}
-	return p.pages[p.currentPage-1], nil
-}
-
-// CurrentPage returns the payload of the current page
-func (p *Pad) CurrentPage() []byte {
+// getPage returns the payload of the current page
+func (p *Pad) getPage() []byte {
 	return p.pages[p.currentPage]
 }
 
-// NextPage will advance the page pointer, and return the payload of the
-// new current key.
-func (p *Pad) NextPage() ([]byte, error) {
+// NextPage will advance the page pointer
+func (p *Pad) NextPage() error {
 	if p.RemainingPages() == 0 {
-		return nil, fmt.Errorf("pad depleted")
+		return fmt.Errorf("pad depleted")
 	}
 	p.currentPage++
-	return p.CurrentPage(), nil
+	return nil
 }
 
-// Encode will take a byte slice and use modular addition to encrypt the
+// Encrypt will take a byte slice and use modular addition to encrypt the
 // payload using the current page.
-func (p *Pad) Encode(payload []byte) ([]byte, error) {
+func (p *Pad) Encrypt(payload []byte) ([]byte, error) {
 	var result []byte
-	page := p.CurrentPage()
+	page := p.getPage()
 
 	// Page must be at least as long as plain text
 	if len(page) < len(payload) {
@@ -83,20 +74,20 @@ func (p *Pad) Encode(payload []byte) ([]byte, error) {
 	}
 
 	for i := 0; i < len(payload); i++ {
-		bdec := int64(payload[i])
-		kdec := int64(page[i])
-		encoded := uint64(bdec+kdec) % ((1 << 64) - 1)
+		bdec := uint8(payload[i])
+		kdec := uint8(page[i])
+		encoded := uint8(bdec+kdec) % 255
 		result = append(result, byte(encoded))
 	}
 	return result, nil
 }
 
-// Decode will accept a byte slice and reverse the process taken by Encode to
+// Decrypt will accept a byte slice and reverse the process taken by Encode to
 // translate encrypted text back into raw bytes. It is required that the page
 // pointer be set to the same position as it was during Encode().
-func (p *Pad) Decode(payload []byte) ([]byte, error) {
+func (p *Pad) Decrypt(payload []byte) ([]byte, error) {
 	var result []byte
-	page := p.CurrentPage()
+	page := p.getPage()
 
 	// Page must be at least as long as plain text
 	if len(page) < len(payload) {
@@ -104,12 +95,9 @@ func (p *Pad) Decode(payload []byte) ([]byte, error) {
 	}
 
 	for i := 0; i < len(payload); i++ {
-		bdec := int64(payload[i])
-		kdec := int64(page[i])
-		decoded := uint64(bdec-kdec) % ((1 << 64) - 1)
-		if decoded < 0 {
-			decoded += 26
-		}
+		bdec := uint8(payload[i])
+		kdec := uint8(page[i])
+		decoded := uint8(bdec-kdec) % 255
 		result = append(result, byte(decoded))
 	}
 	return result, nil
