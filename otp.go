@@ -10,10 +10,6 @@ type Pad struct {
 }
 
 func NewPad(material []byte, pageSize int, startPage int) (*Pad, error) {
-	if startPage < 1 {
-		return nil, fmt.Errorf("minimum start page is 1")
-	}
-
 	if len(material)%pageSize != 0 {
 		return nil, fmt.Errorf("pad size must be divisible by page size")
 	}
@@ -21,6 +17,10 @@ func NewPad(material []byte, pageSize int, startPage int) (*Pad, error) {
 	var pages [][]byte
 	for i := 0; i < len(material); i += pageSize {
 		pages = append(pages, material[i:i+pageSize])
+	}
+
+	if startPage < 1 || startPage > len(pages) {
+		return nil, fmt.Errorf("start page (%d) out of bounds", startPage)
 	}
 
 	p := Pad{
