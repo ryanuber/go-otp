@@ -22,12 +22,13 @@ func NewPad(material []byte, pageSize int, startPage int) (*Pad, error) {
 	}
 
 	if startPage < 1 || startPage > len(pages) {
-		return nil, fmt.Errorf("start page (%d) out of bounds", startPage)
+		return nil, fmt.Errorf("page %d out of bounds", startPage)
 	}
 
+	// Create the new OTP pad
 	p := Pad{
 		pages:       pages,
-		currentPage: startPage - 1,
+		currentPage: startPage,
 	}
 
 	return &p, nil
@@ -38,19 +39,28 @@ func (p *Pad) TotalPages() int {
 	return len(p.pages)
 }
 
-// UnusedPages returns the number of unused pages in the pad
+// RemainingPages returns the number of unused pages in the pad
 func (p *Pad) RemainingPages() int {
-	return len(p.pages) - (p.currentPage + 1)
+	return len(p.pages) - p.currentPage
 }
 
-// UsedPages returns the number of pages that have been used
-func (p *Pad) UsedPages() int {
-	return p.currentPage + 1
+// CurrentPage returns the current position of the page pointer
+func (p *Pad) CurrentPage() int {
+	return p.currentPage
 }
 
 // getPage returns the payload of the current page
 func (p *Pad) getPage() []byte {
-	return p.pages[p.currentPage]
+	return p.pages[p.currentPage-1]
+}
+
+// SetPage will set the page pointer
+func (p *Pad) SetPage(page int) error {
+	if page < 1 || page > p.TotalPages() {
+		return fmt.Errorf("page %d out of bounds", page)
+	}
+	p.currentPage = page
+	return nil
 }
 
 // NextPage will advance the page pointer

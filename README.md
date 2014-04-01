@@ -36,7 +36,9 @@ type Pad
     func (p *Pad) TotalPages() int
     func (p *Pad) RemainingPages() int
     func (p *Pad) UsedPages() int
+    func (p *Pad) CurrentPage() int
     func (p *Pad) NextPage() error
+    func (p *Pad) SetPage(page int) error
     func (p *Pad) Encrypt(payload []byte) ([]byte, error)
     func (p *Pad) Decrypt(payload []byte) ([]byte, error)
 ```
