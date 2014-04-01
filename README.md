@@ -47,7 +47,9 @@ Example
 =======
 
 Following is a basic usage example which creates enough page material to
-facilitate 2048 unique one-time use byte slices, each 16 bytes in size:
+facilitate 2048 unique one-time use byte slices, each 16 bytes in size. The
+pad is then used to perform 2 encryption routines, and some status is
+printed at the end.
 
 ```go
 package main
@@ -81,5 +83,9 @@ func main() {
 	fmt.Println(base64.StdEncoding.EncodeToString(encrypted))
 	decrypted, _ = pad.Decrypt(encrypted)
 	fmt.Printf("%s\n\n", decrypted)
+
+	fmt.Printf("Total pages: %d\n", pad.TotalPages())
+	fmt.Printf("Page pointer: %d\n", pad.CurrentPage())
+	fmt.Printf("Remaining pages: %d\n", pad.RemainingPages())
 }
 ```
