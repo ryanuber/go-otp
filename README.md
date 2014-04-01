@@ -34,7 +34,6 @@ type Pad
     func (p *Pad) PreviousPage() ([]byte, error)
     func (p *Pad) CurrentPage() []byte
     func (p *Pad) NextPage() ([]byte, error)
-    func (p *Pad) PeekNextPage() ([]byte, error)
 ```
 
 Example
