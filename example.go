@@ -10,32 +10,32 @@ func main() {
 	var out []string
 
 	//                        |--||--||--||--||--||--|
-	o, err := otp.New([]byte("lsjkdfjsdlfsyehdu2ue82kd"), 4, 2)
+	p, err := otp.NewPad([]byte("lsjkdfjsdlfsyehdu2ue82kd"), 4, 2)
 	if err != nil {
 		fmt.Printf("failed: %s", err)
 		return
 	}
 
-	totalPages := o.TotalPages()
+	totalPages := p.TotalPages()
 	out = append(out, fmt.Sprintf("Total pages | %d", totalPages))
 
-	remainingPages := o.RemainingPages()
+	remainingPages := p.RemainingPages()
 	out = append(out, fmt.Sprintf("Remaining pages | %d", remainingPages))
 
-	usedPages := o.UsedPages()
+	usedPages := p.UsedPages()
 	out = append(out, fmt.Sprintf("Used pages | %d", usedPages))
 
-	currentPage := o.Current()
+	currentPage := p.Current()
 	out = append(out, fmt.Sprintf("Current page | %s", string(currentPage)))
 
-	nextPage, err := o.PeekNext()
+	nextPage, err := p.PeekNext()
 	if err != nil {
 		fmt.Printf("error: %s\n", err)
 		return
 	}
 	out = append(out, fmt.Sprintf("Next page (peek) | %s", string(nextPage)))
 
-	previousPage, err := o.Previous()
+	previousPage, err := p.Previous()
 	if err != nil {
 		fmt.Printf("error: %s\n", err)
 		return
@@ -47,21 +47,21 @@ func main() {
 	// -------
 	out = append(out, "-------------- Moving to next page ------------------")
 
-	currentPage, err = o.Next()
+	currentPage, err = p.Next()
 	if err != nil {
 		fmt.Printf("error: %s\n", err)
 		return
 	}
 	out = append(out, fmt.Sprintf("Current page | %s", currentPage))
 
-	previousPage, err = o.Previous()
+	previousPage, err = p.Previous()
 	if err != nil {
 		fmt.Printf("error: %s\n", err)
 		return
 	}
 	out = append(out, fmt.Sprintf("Previous page | %s", string(previousPage)))
 
-	nextPage, err = o.PeekNext()
+	nextPage, err = p.PeekNext()
 	if err != nil {
 		fmt.Printf("error: %s\n", err)
 		return

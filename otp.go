@@ -4,70 +4,67 @@ import (
 	"fmt"
 )
 
-type OTP struct {
-	pad      []byte
-	pageSize int
-	offset   int
+type Pad struct {
+	pages       [][]byte
+	currentPage int
 }
 
-func New(pad []byte, pageSize int, offset int) (*OTP, error) {
-	if offset < 1 {
-		return nil, fmt.Errorf("minimum offset is 1")
+func NewPad(material []byte, pageSize int, startPage int) (*OTP, error) {
+	if startPage < 1 {
+		return nil, fmt.Errorf("minimum start page is 1")
 	}
 
-	if len(pad)%pageSize != 0 {
+	if len(material)%pageSize != 0 {
 		return nil, fmt.Errorf("pad size must be divisible by page size")
 	}
 
-	o := OTP{
-		pad:      pad,
-		pageSize: pageSize,
-		offset:   (offset * pageSize) - pageSize,
+	var pages [][]byte
+	for i := 0; i < len(material); i += pageSize {
+		pages = append(pages, material[i:i+pageSize])
 	}
 
-	return &o, nil
+	p := Pad{
+		pages:       pages,
+		currentPage: startPage - 1,
+	}
+
+	return &p, nil
 }
 
-func (o *OTP) TotalPages() int {
-	return len(o.pad) / o.pageSize
+func (p *Pad) TotalPages() int {
+	return len(o.pages)
 }
 
-func (o *OTP) RemainingPages() int {
-	return (len(o.pad) - (o.offset + o.pageSize)) / o.pageSize
+func (p *Pad) RemainingPages() int {
+	return len(o.pages) - o.currentPage
 }
 
-func (o *OTP) UsedPages() int {
-	return o.TotalPages() - o.RemainingPages()
+func (p *Pad) UsedPages() int {
+	return o.currentPage + 1
 }
 
-func (o *OTP) Previous() ([]byte, error) {
-	if o.UsedPages() == 1 {
+func (p *Pad) Previous() ([]byte, error) {
+	if o.currentPage == 0 {
 		return nil, fmt.Errorf("no previous pages")
 	}
-	start := (o.offset - o.pageSize)
-	end := o.offset
-	return o.pad[start:end], nil
+	return o.pages[o.currentPage-1], nil
 }
 
-func (o *OTP) Current() []byte {
-	start := o.offset
-	end := start + o.pageSize
-	return o.pad[start:end]
+func (p *Pad) Current() []byte {
+	return o.pages[o.currentPage]
 }
 
-func (o *OTP) Next() ([]byte, error) {
+func (p *Pad) Next() ([]byte, error) {
 	if o.RemainingPages() == 0 {
 		return nil, fmt.Errorf("pad depleted")
 	}
-	o.offset += o.pageSize
+	o.currentPage++
 	return o.Current(), nil
 }
 
-func (o *OTP) PeekNext() ([]byte, error) {
+func (p *Pad) PeekNext() ([]byte, error) {
 	if o.RemainingPages() == 0 {
 		return nil, fmt.Errorf("pad depleted")
 	}
-	start := o.offset + o.pageSize
-	end := start + o.pageSize
-	return o.pad[start:end], nil
+	return o.pages[o.currentPage+1], nil
 }
