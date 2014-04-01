@@ -9,7 +9,7 @@ type Pad struct {
 	currentPage int
 }
 
-func NewPad(material []byte, pageSize int, startPage int) (*OTP, error) {
+func NewPad(material []byte, pageSize int, startPage int) (*Pad, error) {
 	if startPage < 1 {
 		return nil, fmt.Errorf("minimum start page is 1")
 	}
@@ -32,39 +32,39 @@ func NewPad(material []byte, pageSize int, startPage int) (*OTP, error) {
 }
 
 func (p *Pad) TotalPages() int {
-	return len(o.pages)
+	return len(p.pages)
 }
 
 func (p *Pad) RemainingPages() int {
-	return len(o.pages) - o.currentPage
+	return len(p.pages) - p.currentPage
 }
 
 func (p *Pad) UsedPages() int {
-	return o.currentPage + 1
+	return p.currentPage + 1
 }
 
-func (p *Pad) Previous() ([]byte, error) {
-	if o.currentPage == 0 {
+func (p *Pad) PreviousPage() ([]byte, error) {
+	if p.currentPage == 0 {
 		return nil, fmt.Errorf("no previous pages")
 	}
-	return o.pages[o.currentPage-1], nil
+	return p.pages[p.currentPage-1], nil
 }
 
-func (p *Pad) Current() []byte {
-	return o.pages[o.currentPage]
+func (p *Pad) CurrentPage() []byte {
+	return p.pages[p.currentPage]
 }
 
-func (p *Pad) Next() ([]byte, error) {
-	if o.RemainingPages() == 0 {
+func (p *Pad) NextPage() ([]byte, error) {
+	if p.RemainingPages() == 0 {
 		return nil, fmt.Errorf("pad depleted")
 	}
-	o.currentPage++
-	return o.Current(), nil
+	p.currentPage++
+	return p.CurrentPage(), nil
 }
 
-func (p *Pad) PeekNext() ([]byte, error) {
-	if o.RemainingPages() == 0 {
+func (p *Pad) PeekNextPage() ([]byte, error) {
+	if p.RemainingPages() == 0 {
 		return nil, fmt.Errorf("pad depleted")
 	}
-	return o.pages[o.currentPage+1], nil
+	return p.pages[p.currentPage+1], nil
 }

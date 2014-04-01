@@ -9,7 +9,6 @@ import (
 func main() {
 	var out []string
 
-	//                        |--||--||--||--||--||--|
 	p, err := otp.NewPad([]byte("lsjkdfjsdlfsyehdu2ue82kd"), 4, 2)
 	if err != nil {
 		fmt.Printf("failed: %s", err)
@@ -25,17 +24,17 @@ func main() {
 	usedPages := p.UsedPages()
 	out = append(out, fmt.Sprintf("Used pages | %d", usedPages))
 
-	currentPage := p.Current()
+	currentPage := p.CurrentPage()
 	out = append(out, fmt.Sprintf("Current page | %s", string(currentPage)))
 
-	nextPage, err := p.PeekNext()
+	nextPage, err := p.PeekNextPage()
 	if err != nil {
 		fmt.Printf("error: %s\n", err)
 		return
 	}
 	out = append(out, fmt.Sprintf("Next page (peek) | %s", string(nextPage)))
 
-	previousPage, err := p.Previous()
+	previousPage, err := p.PreviousPage()
 	if err != nil {
 		fmt.Printf("error: %s\n", err)
 		return
@@ -47,21 +46,21 @@ func main() {
 	// -------
 	out = append(out, "-------------- Moving to next page ------------------")
 
-	currentPage, err = p.Next()
+	currentPage, err = p.NextPage()
 	if err != nil {
 		fmt.Printf("error: %s\n", err)
 		return
 	}
 	out = append(out, fmt.Sprintf("Current page | %s", currentPage))
 
-	previousPage, err = p.Previous()
+	previousPage, err = p.PreviousPage()
 	if err != nil {
 		fmt.Printf("error: %s\n", err)
 		return
 	}
 	out = append(out, fmt.Sprintf("Previous page | %s", string(previousPage)))
 
-	nextPage, err = p.PeekNext()
+	nextPage, err = p.PeekNextPage()
 	if err != nil {
 		fmt.Printf("error: %s\n", err)
 		return
