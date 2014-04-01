@@ -64,7 +64,7 @@ func (p *Pad) NextPage() ([]byte, error) {
 
 func (p *Pad) PeekNextPage() ([]byte, error) {
 	if p.RemainingPages() == 0 {
-		return nil, fmt.Errorf("pad depleted")
+		return nil, fmt.Errorf("no pages left")
 	}
 	return p.pages[p.currentPage+1], nil
 }
