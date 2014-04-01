@@ -70,3 +70,42 @@ func (p *Pad) NextPage() ([]byte, error) {
 	p.currentPage++
 	return p.CurrentPage(), nil
 }
+
+func (p *Pad) Encode(in []byte) ([]byte, error) {
+	var result []byte
+	key := p.CurrentPage()
+
+	// Key must be at least as long as plain text
+	if len(key) < len(in) {
+		return nil, fmt.Errorf("insufficient key size")
+	}
+
+	for i := range in {
+		bdec := int64(in[i])
+		kdec := int64(key[i])
+		encoded := uint64(bdec+kdec) % (1 << 63)
+		result = append(result, byte(encoded))
+	}
+	return result, nil
+}
+
+func (p *Pad) Decode(in []byte) ([]byte, error) {
+	var result []byte
+	key := p.CurrentPage()
+
+	// Key must be at least as long as plain text
+	if len(key) < len(in) {
+		return nil, fmt.Errorf("insufficient key size")
+	}
+
+	for i := range in {
+		bdec := int64(in[i])
+		kdec := int64(key[i])
+		decoded := uint64(bdec-kdec) % (1 << 63)
+		if decoded < 0 {
+			decoded += 26
+		}
+		result = append(result, byte(decoded))
+	}
+	return result, nil
+}
