@@ -36,7 +36,7 @@ func (p *Pad) TotalPages() int {
 }
 
 func (p *Pad) RemainingPages() int {
-	return len(p.pages) - p.currentPage
+	return len(p.pages) - (p.currentPage + 1)
 }
 
 func (p *Pad) UsedPages() int {
