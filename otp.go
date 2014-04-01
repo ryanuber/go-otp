@@ -40,7 +40,7 @@ func (o *OTP) UsedPages() int {
 	return o.TotalPages() - o.RemainingPages()
 }
 
-func (o *OTP) PeekPrevious() ([]byte, error) {
+func (o *OTP) Previous() ([]byte, error) {
 	if o.UsedPages() == 1 {
 		return nil, fmt.Errorf("no previous pages")
 	}
@@ -49,10 +49,18 @@ func (o *OTP) PeekPrevious() ([]byte, error) {
 	return o.pad[start:end], nil
 }
 
-func (o *OTP) PeekCurrent() []byte {
+func (o *OTP) Current() []byte {
 	start := o.offset
 	end := start + o.pageSize
 	return o.pad[start:end]
+}
+
+func (o *OTP) Next() ([]byte, error) {
+	if o.RemainingPages() == 0 {
+		return nil, fmt.Errorf("pad depleted")
+	}
+	o.offset += o.pageSize
+	return o.Current(), nil
 }
 
 func (o *OTP) PeekNext() ([]byte, error) {

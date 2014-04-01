@@ -25,7 +25,7 @@ func main() {
 	usedPages := o.UsedPages()
 	out = append(out, fmt.Sprintf("Used pages | %d", usedPages))
 
-	currentPage := o.PeekCurrent()
+	currentPage := o.Current()
 	out = append(out, fmt.Sprintf("Current page | %s", string(currentPage)))
 
 	nextPage, err := o.PeekNext()
@@ -33,14 +33,40 @@ func main() {
 		fmt.Printf("error: %s\n", err)
 		return
 	}
-	out = append(out, fmt.Sprintf("Next page | %s", string(nextPage)))
+	out = append(out, fmt.Sprintf("Next page (peek) | %s", string(nextPage)))
 
-	previousPage, err := o.PeekPrevious()
+	previousPage, err := o.Previous()
 	if err != nil {
 		fmt.Printf("error: %s\n", err)
 		return
 	}
 	out = append(out, fmt.Sprintf("Previous page | %s", string(previousPage)))
+
+	// -------
+	// move to next page
+	// -------
+	out = append(out, "-------------- Moving to next page ------------------")
+
+	currentPage, err = o.Next()
+	if err != nil {
+		fmt.Printf("error: %s\n", err)
+		return
+	}
+	out = append(out, fmt.Sprintf("Current page | %s", currentPage))
+
+	previousPage, err = o.Previous()
+	if err != nil {
+		fmt.Printf("error: %s\n", err)
+		return
+	}
+	out = append(out, fmt.Sprintf("Previous page | %s", string(previousPage)))
+
+	nextPage, err = o.PeekNext()
+	if err != nil {
+		fmt.Printf("error: %s\n", err)
+		return
+	}
+	out = append(out, fmt.Sprintf("Next page (peek) | %s", string(nextPage)))
 
 	output, _ := columnize.SimpleFormat(out)
 	fmt.Println(output)
