@@ -1,23 +1,23 @@
 package otp
 
-import (
-	"fmt"
-)
+import "fmt"
 
 type Pad struct {
 	pages       [][]byte
 	currentPage int
 }
 
-// NewPad creates a new "one-time pad"
+// NewPad creates a new "one-time pad" by accepting arbitrary bytes from the
+// user and setting up pages from it. This method also allows passing the
+// page pointer value to make resuming an existing pad easy.
 func NewPad(material []byte, pageSize int, startPage int) (*Pad, error) {
-	if len(material)%pageSize != 0 {
-		return nil, fmt.Errorf("pad size must be divisible by page size")
+	if len(material) < pageSize {
+		return nil, fmt.Errorf("page size too large for pad material")
 	}
 
 	// Do the page-splitting work up front
 	var pages [][]byte
-	for i := 0; i < len(material); i += pageSize {
+	for i := 0; i+pageSize <= len(material); i += pageSize {
 		pages = append(pages, material[i:i+pageSize])
 	}
 
@@ -66,7 +66,7 @@ func (p *Pad) SetPage(page int) error {
 // NextPage will advance the page pointer
 func (p *Pad) NextPage() error {
 	if p.RemainingPages() == 0 {
-		return fmt.Errorf("pad depleted")
+		return fmt.Errorf("pad exhausted")
 	}
 	p.currentPage++
 	return nil

@@ -7,24 +7,33 @@ import (
 )
 
 func TestNewPad(t *testing.T) {
-	m := make([]byte, 32)
+	m := make([]byte, 35)
 	_, err := rand.Read(m)
 	if err != nil {
 		t.Fatalf("err: %s", err)
 	}
 
-	// Make sure we can properly create a new pad
+	// New pads are properly created
 	if _, err := NewPad(m, 8, 1); err != nil {
 		t.Fatalf("bad: %s", err)
 	}
 
-	// Make sure an error is thrown if the pad size and the page size are not
-	// cleanly divisible
-	if _, err := NewPad(m, 7, 1); err == nil {
+	// An error is thrown if no pages can be created
+	if _, err := NewPad(m, 37, 1); err == nil {
 		t.Fatalf("Expected page size error")
 	}
 
-	// Make sure an error is thrown if the startPage is out of bounds
+	// The maximum number of pages possible are created
+	p, err := NewPad(m, 8, 1)
+	if err != nil {
+		t.Fatalf("err: %s", err)
+	}
+	totalPages := p.TotalPages()
+	if totalPages != 4 {
+		t.Fatalf("Expected 4 total pages, got %d", totalPages)
+	}
+
+	// An error is thrown if the startPage is out of bounds
 	if _, err := NewPad(m, 8, 5); err == nil {
 		t.Fatalf("Expected out of bounds error")
 	}
