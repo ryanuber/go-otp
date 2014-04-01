@@ -75,16 +75,16 @@ func (p *Pad) NextPage() ([]byte, error) {
 // payload using the current page.
 func (p *Pad) Encode(payload []byte) ([]byte, error) {
 	var result []byte
-	key := p.CurrentPage()
+	page := p.CurrentPage()
 
-	// Key must be at least as long as plain text
-	if len(key) < len(payload) {
-		return nil, fmt.Errorf("insufficient key size")
+	// Page must be at least as long as plain text
+	if len(page) < len(payload) {
+		return nil, fmt.Errorf("insufficient page size")
 	}
 
 	for i := 0; i < len(payload); i++ {
 		bdec := int64(payload[i])
-		kdec := int64(key[i])
+		kdec := int64(page[i])
 		encoded := uint64(bdec+kdec) % (1 << 63)
 		result = append(result, byte(encoded))
 	}
@@ -96,16 +96,16 @@ func (p *Pad) Encode(payload []byte) ([]byte, error) {
 // pointer be set to the same position as it was during Encode().
 func (p *Pad) Decode(payload []byte) ([]byte, error) {
 	var result []byte
-	key := p.CurrentPage()
+	page := p.CurrentPage()
 
-	// Key must be at least as long as plain text
-	if len(key) < len(payload) {
-		return nil, fmt.Errorf("insufficient key size")
+	// Page must be at least as long as plain text
+	if len(page) < len(payload) {
+		return nil, fmt.Errorf("insufficient page size")
 	}
 
 	for i := 0; i < len(payload); i++ {
 		bdec := int64(payload[i])
-		kdec := int64(key[i])
+		kdec := int64(page[i])
 		decoded := uint64(bdec-kdec) % (1 << 63)
 		if decoded < 0 {
 			decoded += 26
