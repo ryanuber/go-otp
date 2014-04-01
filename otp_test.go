@@ -1,8 +1,8 @@
 package otp
 
 import (
-	"bytes"
 	"crypto/rand"
+	"encoding/base64"
 	"testing"
 )
 
@@ -30,24 +30,6 @@ func TestNewPad(t *testing.T) {
 	}
 }
 
-func TestTotalPages(t *testing.T) {
-	m := make([]byte, 32)
-	_, err := rand.Read(m)
-	if err != nil {
-		t.Fatalf("err: %s", err)
-	}
-
-	p, err := NewPad(m, 8, 1)
-	if err != nil {
-		t.Fatalf("bad: %s", err)
-	}
-
-	totalPages := p.TotalPages()
-	if totalPages != 4 {
-		t.Fatalf("Expected 4 pages, got %d", totalPages)
-	}
-}
-
 func TestPages(t *testing.T) {
 	m := make([]byte, 32)
 	_, err := rand.Read(m)
@@ -60,46 +42,70 @@ func TestPages(t *testing.T) {
 		t.Fatalf("bad: %s", err)
 	}
 
-	// Error is thrown if we attempt to look at pages < 1
-	if _, err := p.PreviousPage(); err == nil {
-		t.Fatalf("Expected out of bounds error")
+	// Make sure the total number of pages is correct
+	totalPages := p.TotalPages()
+	if totalPages != 4 {
+		t.Fatalf("Expected 4 pages, got %d", totalPages)
 	}
 
 	// Current page is properly returned
-	if !bytes.Equal(p.CurrentPage(), m[0:8]) {
-		t.Fatalf("First page does not match expected bytes")
+	page := p.CurrentPage()
+	if page != 1 {
+		t.Fatalf("Expected page pointer to be 1, got %d", page)
 	}
 
 	// Advancing the page works properly
-	nextPage, err := p.NextPage()
-	if err != nil {
+	if err := p.NextPage(); err != nil {
 		t.Fatalf("bad: %s", err)
-	}
-
-	if !bytes.Equal(nextPage, m[8:16]) {
-		t.Fatalf("Page does not match expected bytes")
 	}
 
 	// Page pointer is updated after page advance
-	if !bytes.Equal(p.CurrentPage(), m[8:16]) {
-		t.Fatalf("Page pointer not properly advanced")
+	page = p.CurrentPage()
+	if page != 2 {
+		t.Fatalf("Expected page pointer to be 2, got %d", page)
 	}
 
-	// Previous page is properly returned
-	previousPage, err := p.PreviousPage()
+	// Explicitly setting the page works properly
+	if err := p.SetPage(4); err != nil {
+		t.Fatalf("err: %s", err)
+	}
+
+	// Advancing the page past the end of the pad should throw an error
+	if err := p.NextPage(); err == nil {
+		t.Fatalf("Expected pad depleted error")
+	}
+}
+
+func TestEncryption(t *testing.T) {
+	m := []byte("123456789abcdefghijklmno")
+	p, err := NewPad(m, 4, 1)
 	if err != nil {
-		t.Fatalf("bad: %s", err)
+		t.Fatalf("err: %s", err)
 	}
 
-	if !bytes.Equal(previousPage, m[0:8]) {
-		t.Fatalf("Previous page did not match expected bytes")
+	encrypted1, err := p.Encrypt([]byte("test"))
+	encoded1 := base64.StdEncoding.EncodeToString(encrypted1)
+	if encoded1 != "pZemqA==" {
+		t.Fatalf("bad: %s", encoded1)
 	}
 
-	// By advancing the page twice more, we should be at the last page, where
-	// requests for yet another page should fail.
-	p.NextPage()
-	p.NextPage()
-	if _, err := p.NextPage(); err == nil {
-		t.Fatalf("Expected out of bounds error")
+	if err := p.NextPage(); err != nil {
+		t.Fatalf("err: %s", err)
+	}
+
+	encrypted2, err := p.Encrypt([]byte("test"))
+	encoded2 := base64.StdEncoding.EncodeToString(encrypted2)
+	if encoded2 != "qZuqrA==" {
+		t.Fatalf("bad: %s", encoded2)
+	}
+
+	if err := p.SetPage(6); err != nil {
+		t.Fatalf("err: %s", err)
+	}
+
+	encrypted3, err := p.Encrypt([]byte("test"))
+	encoded3 := base64.StdEncoding.EncodeToString(encrypted3)
+	if encoded3 != "4NLh4w==" {
+		t.Fatalf("bad: %s", encoded3)
 	}
 }
