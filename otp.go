@@ -84,10 +84,10 @@ func (p *Pad) Encrypt(payload []byte) ([]byte, error) {
 	}
 
 	for i := 0; i < len(payload); i++ {
-		plainText := payload[i]
-		secretKey := page[i]
+		plainText := int(payload[i])
+		secretKey := int(page[i])
 		cipherText := (plainText + secretKey) % 255
-		result = append(result, cipherText)
+		result = append(result, byte(cipherText))
 	}
 	return result, nil
 }
@@ -105,13 +105,13 @@ func (p *Pad) Decrypt(payload []byte) ([]byte, error) {
 	}
 
 	for i := 0; i < len(payload); i++ {
-		cipherText := payload[i]
-		secretKey := page[i]
+		cipherText := int(payload[i])
+		secretKey := int(page[i])
 		plainText := (cipherText - secretKey) % 255
 		if plainText < 0 {
 			plainText += 255
 		}
-		result = append(result, plainText)
+		result = append(result, byte(plainText))
 	}
 	return result, nil
 }
