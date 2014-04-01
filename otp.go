@@ -70,12 +70,3 @@ func (p *Pad) NextPage() ([]byte, error) {
 	p.currentPage++
 	return p.CurrentPage(), nil
 }
-
-// PeekNextPage returns the payload of the next page without advancing the
-// page pointer.
-func (p *Pad) PeekNextPage() ([]byte, error) {
-	if p.RemainingPages() == 0 {
-		return nil, fmt.Errorf("no pages left")
-	}
-	return p.pages[p.currentPage+1], nil
-}
