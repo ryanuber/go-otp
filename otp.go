@@ -87,8 +87,6 @@ func (p *Pad) Encrypt(payload []byte) ([]byte, error) {
 		plainText := payload[i]
 		secretKey := page[i]
 		cipherText := (plainText + secretKey) % 255
-		fmt.Printf("c: %s\n", string(cipherText))
-		fmt.Printf("p: %s\n\n", string(plainText))
 		result = append(result, cipherText)
 	}
 	return result, nil
