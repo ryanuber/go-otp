@@ -47,6 +47,7 @@ package main
 
 import (
 	"crypto/rand"
+	"encoding/base64"
 	"fmt"
 	"github.com/ryanuber/go-otp"
 )
@@ -62,10 +63,13 @@ func main() {
 		return
 	}
 
-	// Display the page data at page 1
-	currentData := pad.CurrentPage()
+	page := pad.CurrentPage()
+	fmt.Println(base64.StdEncoding.EncodeToString(page))
 
-	// Display the page data at page 2 (advances pointer)
-	nextPage := pad.NextPage()
+	page, err = pad.NextPage()
+	if err != nil {
+		fmt.Printf("%s", err)
+	}
+	fmt.Println(base64.StdEncoding.EncodeToString(page))
 }
 ```
