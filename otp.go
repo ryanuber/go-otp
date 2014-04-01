@@ -71,17 +71,19 @@ func (p *Pad) NextPage() ([]byte, error) {
 	return p.CurrentPage(), nil
 }
 
-func (p *Pad) Encode(in []byte) ([]byte, error) {
+// Encode will take a byte slice and use modular addition to encrypt the
+// payload using the current page.
+func (p *Pad) Encode(payload []byte) ([]byte, error) {
 	var result []byte
 	key := p.CurrentPage()
 
 	// Key must be at least as long as plain text
-	if len(key) < len(in) {
+	if len(key) < len(payload) {
 		return nil, fmt.Errorf("insufficient key size")
 	}
 
-	for i := range in {
-		bdec := int64(in[i])
+	for i := 0; i < len(payload); i++ {
+		bdec := int64(payload[i])
 		kdec := int64(key[i])
 		encoded := uint64(bdec+kdec) % (1 << 63)
 		result = append(result, byte(encoded))
@@ -89,17 +91,20 @@ func (p *Pad) Encode(in []byte) ([]byte, error) {
 	return result, nil
 }
 
-func (p *Pad) Decode(in []byte) ([]byte, error) {
+// Decode will accept a byte slice and reverse the process taken by Encode to
+// translate encrypted text back into raw bytes. It is required that the page
+// pointer be set to the same position as it was during Encode().
+func (p *Pad) Decode(payload []byte) ([]byte, error) {
 	var result []byte
 	key := p.CurrentPage()
 
 	// Key must be at least as long as plain text
-	if len(key) < len(in) {
+	if len(key) < len(payload) {
 		return nil, fmt.Errorf("insufficient key size")
 	}
 
-	for i := range in {
-		bdec := int64(in[i])
+	for i := 0; i < len(payload); i++ {
+		bdec := int64(payload[i])
 		kdec := int64(key[i])
 		decoded := uint64(bdec-kdec) % (1 << 63)
 		if decoded < 0 {
