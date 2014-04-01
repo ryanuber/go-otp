@@ -1,7 +1,7 @@
 go-otp
 ======
 
-OTP ("One-Time Pad") Implementation in Go
+OTP ("One-Time Pad") Utility for Go
 
 This simple Go package implements an [OTP](http://en.wikipedia.org/wiki/One-time_pad)
 container to ease the process of creating and utilizing single-use tokens.
