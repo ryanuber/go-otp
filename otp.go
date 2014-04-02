@@ -80,7 +80,6 @@ func (p *Pad) NextPage() error {
 // Encrypt will take a byte slice and use modular addition to encrypt the
 // payload using the current page.
 func (p *Pad) Encrypt(payload []byte) ([]byte, error) {
-	var result []byte
 	page := p.getPage()
 
 	// Page must be at least as long as plain text
@@ -88,12 +87,15 @@ func (p *Pad) Encrypt(payload []byte) ([]byte, error) {
 		return nil, fmt.Errorf("insufficient page size")
 	}
 
+	result := make([]byte, len(payload))
+
 	for i := 0; i < len(payload); i++ {
 		plainText := int(payload[i])
 		secretKey := int(page[i])
 		cipherText := (plainText + secretKey) % 255
-		result = append(result, byte(cipherText))
+		result[i] = byte(cipherText)
 	}
+
 	return result, nil
 }
 
@@ -101,13 +103,14 @@ func (p *Pad) Encrypt(payload []byte) ([]byte, error) {
 // translate encrypted text back into raw bytes. It is required that the page
 // pointer be set to the same position as it was during Encode().
 func (p *Pad) Decrypt(payload []byte) ([]byte, error) {
-	var result []byte
 	page := p.getPage()
 
 	// Page must be at least as long as plain text
 	if len(page) < len(payload) {
 		return nil, fmt.Errorf("insufficient page size")
 	}
+
+	result := make([]byte, len(payload))
 
 	for i := 0; i < len(payload); i++ {
 		cipherText := int(payload[i])
@@ -116,7 +119,8 @@ func (p *Pad) Decrypt(payload []byte) ([]byte, error) {
 		if plainText < 0 {
 			plainText += 255
 		}
-		result = append(result, byte(plainText))
+		result[i] = byte(plainText)
 	}
+
 	return result, nil
 }
