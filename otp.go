@@ -11,6 +11,11 @@ type Pad struct {
 // user and setting up pages from it. This method also allows passing the
 // page pointer value to make resuming an existing pad easy.
 func NewPad(material []byte, pageSize int, startPage int) (*Pad, error) {
+	// A zero-length page would cause this routine to loop infinitely
+	if pageSize < 1 {
+		return nil, fmt.Errorf("page length must be greater than 0")
+	}
+
 	if len(material) < pageSize {
 		return nil, fmt.Errorf("page size too large for pad material")
 	}

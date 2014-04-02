@@ -18,6 +18,11 @@ func TestNewPad(t *testing.T) {
 		t.Fatalf("bad: %s", err)
 	}
 
+	// An error is thrown on zero-length pages
+	if _, err := NewPad(m, 0, 1); err == nil {
+		t.Fatalf("Expected zero-length page error")
+	}
+
 	// An error is thrown if no pages can be created
 	if _, err := NewPad(m, 37, 1); err == nil {
 		t.Fatalf("Expected page size error")
