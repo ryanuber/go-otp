@@ -26,14 +26,15 @@ func NewPad(material []byte, pageSize int, startPage int) (*Pad, error) {
 		pages = append(pages, material[i:i+pageSize])
 	}
 
-	if startPage < 1 || startPage > len(pages) {
-		return nil, fmt.Errorf("page %d out of bounds", startPage)
-	}
-
 	// Create the new OTP pad
 	p := Pad{
 		pages:       pages,
 		currentPage: startPage,
+	}
+
+	// Set the page index in the new pad
+	if err := p.SetPage(startPage); err != nil {
+		return nil, err
 	}
 
 	return &p, nil
