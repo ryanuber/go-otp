@@ -13,11 +13,11 @@ type Pad struct {
 func NewPad(material []byte, pageSize int, startPage int) (*Pad, error) {
 	// A zero-length page would cause this routine to loop infinitely
 	if pageSize < 1 {
-		return nil, fmt.Errorf("page length must be greater than 0")
+		return nil, fmt.Errorf("otp: page length must be greater than 0")
 	}
 
 	if len(material) < pageSize {
-		return nil, fmt.Errorf("page size too large for pad material")
+		return nil, fmt.Errorf("otp: page size too large for pad material")
 	}
 
 	// Do the page-splitting work up front
@@ -63,7 +63,7 @@ func (p *Pad) getPage() []byte {
 // SetPage will set the page pointer
 func (p *Pad) SetPage(page int) error {
 	if page < 1 || page > p.TotalPages() {
-		return fmt.Errorf("page %d out of bounds", page)
+		return fmt.Errorf("otp: page %d out of bounds", page)
 	}
 	p.currentPage = page
 	return nil
@@ -72,7 +72,7 @@ func (p *Pad) SetPage(page int) error {
 // NextPage will advance the page pointer
 func (p *Pad) NextPage() error {
 	if p.RemainingPages() == 0 {
-		return fmt.Errorf("pad exhausted")
+		return fmt.Errorf("otp: pad exhausted")
 	}
 	p.currentPage++
 	return nil
@@ -85,7 +85,7 @@ func (p *Pad) Encrypt(payload []byte) ([]byte, error) {
 
 	// Page must be at least as long as plain text
 	if len(page) < len(payload) {
-		return nil, fmt.Errorf("insufficient page size")
+		return nil, fmt.Errorf("otp: insufficient page size")
 	}
 
 	result := make([]byte, len(payload))
@@ -108,7 +108,7 @@ func (p *Pad) Decrypt(payload []byte) ([]byte, error) {
 
 	// Page must be at least as long as plain text
 	if len(page) < len(payload) {
-		return nil, fmt.Errorf("insufficient page size")
+		return nil, fmt.Errorf("otp: insufficient page size")
 	}
 
 	result := make([]byte, len(payload))
