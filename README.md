@@ -35,7 +35,6 @@ func NewPad(material []byte, pageSize int, startPage int) (*Pad, error)
 type Pad
     func (p *Pad) TotalPages() int
     func (p *Pad) RemainingPages() int
-    func (p *Pad) UsedPages() int
     func (p *Pad) CurrentPage() int
     func (p *Pad) NextPage() error
     func (p *Pad) SetPage(page int) error
