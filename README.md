@@ -1,4 +1,4 @@
-go-otp
+go-otp [![Build Status](https://travis-ci.org/ryanuber/go-otp.svg)](https://travis-ci.org/ryanuber/go-otp)
 ======
 
 OTP ("One-Time Pad") Utility for Go
