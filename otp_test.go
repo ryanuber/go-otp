@@ -1,6 +1,7 @@
 package otp
 
 import (
+	"bytes"
 	"crypto/rand"
 	"encoding/base64"
 	"testing"
@@ -121,5 +122,57 @@ func TestEncryption(t *testing.T) {
 	encoded3 := base64.StdEncoding.EncodeToString(encrypted3)
 	if encoded3 != "4NLh4w==" {
 		t.Fatalf("bad: %s", encoded3)
+	}
+}
+
+func TestEncryption_Failure(t *testing.T) {
+	m := []byte("12345")
+	p, err := NewPad(m, 5, 1)
+	if err != nil {
+		t.Fatalf("err: %s", err)
+	}
+
+	if _, err := p.Encrypt([]byte("123456")); err == nil {
+		t.Fatalf("expected page size error")
+	}
+}
+
+func TestDecryption(t *testing.T) {
+	message := []byte("hello world")
+
+	// Use at least one byte with ASCII value > 127 so that operations can be
+	// verified to reverse correctly when modular addition folds values.
+	m := []byte("ÿ0123456789")
+	p, err := NewPad(m, 11, 1)
+	if err != nil {
+		t.Fatalf("err: %s", err)
+	}
+
+	encrypted, err := p.Encrypt(message)
+	if err != nil {
+		t.Fatalf("err: %s", err)
+	}
+
+	decrypted, err := p.Decrypt(encrypted)
+	if err != nil {
+		t.Fatalf("err: %s", err)
+	}
+
+	if !bytes.Equal(message, decrypted) {
+		t.Fatalf("bad: %v", decrypted)
+	}
+}
+
+func TestDecryption_Failure(t *testing.T) {
+	message := []byte("hello world")
+
+	m := []byte("12345")
+	p, err := NewPad(m, 5, 1)
+	if err != nil {
+		t.Fatalf("err: %s", err)
+	}
+
+	if _, err := p.Decrypt(message); err == nil {
+		t.Fatalf("expected page size error")
 	}
 }
